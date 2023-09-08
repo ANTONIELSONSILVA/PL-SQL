@@ -1,0 +1,149 @@
+Declare 
+   a Number := 3;
+Begin 
+   	a := a + 1;
+	DBMS_OUTPUT.PUT_LINE(a); -- para exibir uma mensagem
+End;
+
+CREATE TABLE cliente (
+    id             NUMBER(7),
+    nome           VARCHAR2(30)
+);
+
+ INSERT INTO cliente VALUES (202, 'OJ Atheletics');
+ INSERT INTO cliente VALUES (203, 'Delhi Sports');
+ INSERT INTO cliente VALUES (204, 'Womansport');
+
+Select * from cliente;
+
+DECLARE
+  v_registro Cliente%ROWTYPE;
+BEGIN
+  Select * INTO v_registro From Cliente Where id=204;
+  DBMS_OUTPUT.PUT_LINE('ID= ' || v_registro.Id);
+  DBMS_OUTPUT.PUT_LINE('Nome: ' || v_registro.Nome);
+END;
+
+    Create Table T1(e Integer, f Integer);
+    Insert into t1 values(1, 3);
+    Insert into t1 values(2, 4);
+
+Select * from t1;
+
+
+Declare
+	a NUMBER; 
+	b NUMBER;
+Begin 
+	select e,f into a,b from t1 where e>1;
+	DBMS_OUTPUT.PUT_LINE('A= ' || a);
+	DBMS_OUTPUT.PUT_LINE('B= ' || b);	
+   INSERT INTO T1 values(b,a);
+End;
+
+Select * from t1;
+
+INSERT INTO T1 values(4,2);
+
+CREATE TABLE MENSAGEM(msg Varchar2(100));
+
+Declare
+ V_NR INTEGER; -- declarando a variável
+ Begin
+   Delete mensagem;
+   V_NR := 120; -- atribuindo um valor a variável
+   Insert into mensagem values
+     ('Número: ' || TO_CHAR(V_NR)); -- inserindo na tabela mensagem
+   Commit;
+ End;
+
+Select * from mensagem;
+
+DECLARE
+  v_nr1 INTEGER:=15;--declaração e inicialização do primeiro número
+  v_nr2 INTEGER:=25;-- declaração e inicialização do segundo número
+  v_msg mensagem.msg%type; -- declaração de uma variável do mesmo 
+                           --tipo da coluna da tabela mensagem
+  v_soma INTEGER; -- declaração da variável para soma
+BEGIN
+  DELETE MENSAGEM;-- Limpa a tabela Mensagem
+  v_soma := v_nr1 + v_nr2; -- somando os números
+  -- criando a mensagem a ser inserida na tabela, poderia ser feito 
+  -- dentro do comando de insert
+  v_msg := 'O número um é '|| v_nr1 ||', o número 2 é '|| v_nr2 ||', e a soma dos dois é '|| v_soma || '. ';
+
+  INSERT INTO MENSAGEM VALUES  (v_msg);
+  COMMIT;
+END;
+
+
+CREATE TABLE Regiao(  id Integer,  nome_reg Varchar2(20) );
+
+INSERT INTO Regiao values(1,'Norte');
+INSERT INTO Regiao values(2,'Sul');
+INSERT INTO Regiao values(3,'Sudeste');
+INSERT INTO Regiao values(4,'Nordeste');
+INSERT INTO Regiao values(5,'Centro-Oeste');
+
+Select * from mensagem;
+Select * from regiao;
+
+DECLARE
+  id_regiao REGIAO.ID%TYPE;
+  nome_regiao REGIAO.NOME_REG%TYPE;
+BEGIN
+  id_regiao := 1;
+  SELECT nome_reg INTO nome_regiao FROM Regiao WHERE ID=id_regiao;
+  INSERT
+  INTO mensagem VALUES ('A região código '
+      || TO_CHAR(id_regiao)
+      || ' é '
+      || nome_regiao  );
+END;
+
+
+DECLARE
+  R_REG REGIAO%ROWTYPE; -- registro da região
+  V_ID INTEGER := 5;    -- aqui pode ser qualquer número entre 1 e 5
+BEGIN
+  DELETE MENSAGEM;
+  SELECT * INTO R_REG FROM REGIAO WHERE ID = V_ID; -- leitura dos dados da regiao
+  INSERT INTO MENSAGEM VALUES
+    ('A região código '
+      || TO_CHAR(R_REG.ID)
+      || ' é '
+      || R_REG.NOME_REG  ); -- inserindo na tabela mensagem
+  COMMIT;
+END;
+
+CREATE TABLE Relatorio(  nr number(8),  texto char(100) );
+
+CREATE TABLE Empregado( id Integer,  pri_nome Varchar2(20), ult_nome Varchar2(20) );
+
+INSERT INTO Empregado values(1,'André', 'da Silva');
+INSERT INTO Empregado values(2,'Maria', 'de Oliveira');
+INSERT INTO Empregado values(3,'João', 'de Menezes');
+INSERT INTO Empregado values(4,'Marcela', 'Dutra');
+INSERT INTO Empregado values(5,'Carlos', 'Sicsú');
+
+Select * from empregado;
+
+
+DECLARE
+  R_REG_EMP Empregado%ROWTYPE; -- registro do empregado
+  V_ID  INTEGER := 5; -- aqui pode ser qualquer número entre 1 e 5
+BEGIN
+  DELETE Relatorio;
+   -- leitura dos dados do empregado
+  SELECT * INTO R_REG_EMP FROM Empregado WHERE ID = V_ID; 
+   -- inserindo na tabela relatorio
+  INSERT INTO Relatorio VALUES (R_REG_EMP.ID, R_REG_EMP.pri_nome || ' ' || R_REG_EMP.ult_nome);
+  COMMIT;
+END;
+Select * from relatorio;
+
+
+
+
+
+

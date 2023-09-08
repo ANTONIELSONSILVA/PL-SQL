@@ -1,0 +1,223 @@
+CREATE TABLE cliente (
+    id             NUMBER(7),
+    nome           VARCHAR2(30)
+);
+
+ INSERT INTO cliente VALUES (202, 'OJ Atheletics');
+ INSERT INTO cliente VALUES (203, 'Delhi Sports');
+ INSERT INTO cliente VALUES (204, 'Womansport');
+
+Select * from cliente;
+
+SET SERVEROUTPUT ON
+
+DBMS_OUTPUT.PUT_LINE(' The First Name of the Employee is ');
+
+ Declare 
+   v_id number := 204;
+   v_nome varchar2(30);
+ Begin
+  Select nome INTO v_nome From Cliente Where id = v_id;
+  DBMS_OUTPUT.PUT_LINE(' O nome do Cliente é ' || v_nome);
+End;
+
+
+
+
+ Declare 
+   v_id number;
+   v_nome varchar2(30);
+ Begin
+  v_id := 203; 
+  Select nome INTO v_nome From Cliente Where id = v_id;
+  DBMS_OUTPUT.PUT_LINE(' O nome do Cliente é ' || v_nome);
+End;
+
+
+ Declare 
+   -- comentário
+   v_nome varchar2(30);
+   v_idade integer := 22;
+ Begin
+  Select nome INTO v_nome From Cliente Where id = 203;
+  DBMS_OUTPUT.PUT_LINE(' O nome do Cliente é ' || v_nome);
+  DBMS_OUTPUT.PUT_LINE(' A idade é de ' || v_idade);
+End;
+
+DECLARE
+ v_myName VARCHAR2(20); 
+BEGIN
+ DBMS_OUTPUT.PUT_LINE('My name is: '|| v_myName); 
+ v_myName := 'John';
+ DBMS_OUTPUT.PUT_LINE('My name is: '|| v_myName); 
+END;
+
+DECLARE
+ v_myName VARCHAR2(20):= 'John'; 
+BEGIN
+ DBMS_OUTPUT.PUT_LINE('My name is: '|| v_myName); 
+ v_myName := 'Steven';
+ DBMS_OUTPUT.PUT_LINE('My name is: '|| v_myName); 
+END;
+
+
+DECLARE
+ v_event VARCHAR2(15);  
+BEGIN
+ v_event	:= q'!Father's day!'; 
+ DBMS_OUTPUT.PUT_LINE('3rd Sunday in June is :'|| v_event);
+ v_event	:= q'[Mother's day]';  
+ DBMS_OUTPUT.PUT_LINE('2nd Sunday in May is:'|| v_event);
+END;
+
+
+Declare 
+  v_nome varchar2(50);
+  v_id NUMBER;
+Begin
+  Select nome, id INTO v_nome, v_id 
+    From Cliente  Where id = 204;
+  
+  DBMS_OUTPUT.PUT_LINE(v_nome);
+  DBMS_OUTPUT.PUT_LINE(v_id);
+End;
+
+
+
+Begin
+
+  DBMS_OUTPUT.PUT_LINE(SYSDATE+7);
+End;
+
+Declare 
+  v_nome Cliente.nome%type;
+  v_id Cliente.id%type;
+Begin
+  Select nome, id
+    INTO v_nome, v_id 
+    From Cliente
+    Where id = 204;
+  
+  DBMS_OUTPUT.PUT_LINE(v_nome);
+  DBMS_OUTPUT.PUT_LINE(v_id);
+  
+End;
+
+
+Declare 
+  v_nome CLIENTE.NOME%type;
+  v_id CLIENTE.ID%type;
+begin
+  Select nome, id
+    into v_nome, v_id 
+    from cliente
+    where id = 202;
+  -- Comentário de linha
+  DBMS_OUTPUT.PUT_LINE(v_nome);
+  DBMS_OUTPUT.PUT_LINE(v_id);
+  /* Comentário
+     de bloco
+  */
+end;
+
+DECLARE
+  v_nome CLIENTE.NOME%type;
+  v_id CLIENTE.ID%type;
+BEGIN
+  SELECT nome, id 
+  INTO v_nome, v_id 
+  FROM cliente 
+  WHERE id = 204;
+  -- Comentário de linha
+  DBMS_OUTPUT.PUT_LINE(v_nome);
+  DBMS_OUTPUT.PUT_LINE(v_id);
+  /* Comentário
+  de bloco
+  */
+  DBMS_OUTPUT.PUT_LINE( Length(v_nome));
+END;
+
+
+DECLARE
+  v_outer_variable VARCHAR2(20):='GLOBAL VARIABLE';  
+  BEGIN
+    DECLARE
+      v_inner_variable VARCHAR2(20):='LOCAL VARIABLE';  
+    BEGIN
+      DBMS_OUTPUT.PUT_LINE(v_inner_variable);    
+      DBMS_OUTPUT.PUT_LINE(v_outer_variable);  
+    END;
+    --DBMS_OUTPUT.PUT_LINE(v_inner_variable); 
+    DBMS_OUTPUT.PUT_LINE(v_outer_variable);  
+END;
+
+
+DECLARE
+    v_father_name VARCHAR2(20):='Patrick';    
+    v_date_of_birth DATE:='20-Apr-1972';  
+BEGIN
+    DECLARE
+    v_child_name VARCHAR2(20):='Mike';   
+    v_date_of_birth DATE:='12-Dec-2002';  
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Father''s Name: '||v_father_name);   
+        DBMS_OUTPUT.PUT_LINE('Date of Birth: '||v_date_of_birth);  
+        DBMS_OUTPUT.PUT_LINE('Child''s Name: '||v_child_name);  
+    END;
+    DBMS_OUTPUT.PUT_LINE('Date of Birth: '||v_date_of_birth);  
+END;
+
+
+BEGIN <<outer>>  
+    DECLARE
+        v_father_name VARCHAR2(20):='Patrick';  
+        v_date_of_birth DATE:='20-Apr-1972';  
+    BEGIN
+        DECLARE
+            v_child_name VARCHAR2(20):='Mike';  
+            v_date_of_birth DATE:='12-Dec-2002';  
+        BEGIN
+DBMS_OUTPUT.PUT_LINE('Father''s Name: '||v_father_name);  
+DBMS_OUTPUT.PUT_LINE('Date of Birth: ' ||outer.v_date_of_birth);  
+DBMS_OUTPUT.PUT_LINE('Child''s Name: '||v_child_name);  
+DBMS_OUTPUT.PUT_LINE('Date of Birth: '||v_date_of_birth); 
+        END;
+    END;
+END outer;
+
+
+DECLARE
+  v_ids CLIENTE.ID%type;
+BEGIN
+  SELECT sum(id) 
+  INTO v_ids 
+  FROM cliente ;
+  DBMS_OUTPUT.PUT_LINE( v_ids);
+END;
+
+
+BEGIN
+  INSERT
+  INTO cliente
+    ( id, nome)
+    VALUES
+    ( 205, 'Ruth');
+END;
+
+select * from cliente;
+
+BEGIN
+  UPDATE cliente
+    set nome = 'Carlos'
+    Where id = 205;
+END;
+select * from cliente;
+
+
+BEGIN
+  DELETE cliente
+  Where id = 205;
+END;
+
+select * from cliente;
+

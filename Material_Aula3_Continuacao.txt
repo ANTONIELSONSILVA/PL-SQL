@@ -1,0 +1,235 @@
+SET VERIFY OFF  
+
+DECLARE
+v_grade	CHAR(1) := UPPER('A');  
+v_appraisal VARCHAR2(20);
+BEGIN
+    v_appraisal :=  CASE v_grade  
+                    WHEN 'A' THEN 'Excelente'  
+                    WHEN 'B' THEN 'Muito bom'  
+                    WHEN 'C' THEN 'bom'
+                    ELSE 'Não foi bom'  
+                    END;
+    DBMS_OUTPUT.PUT_LINE ('Grau: '|| v_grade || ' Situação ' || v_appraisal);
+END;
+
+
+DECLARE
+  v_grade     CHAR(1);
+  v_appraisal VARCHAR2(20);
+BEGIN
+  v_grade := UPPER('d');
+  v_appraisal :=
+  CASE
+  WHEN v_grade = 'A' THEN
+    'Excellent'
+  WHEN v_grade IN ('B', 'C') THEN
+    'Good'
+  ELSE
+    'No such grade'
+  END;
+  DBMS_OUTPUT.PUT_LINE ('Grade: '|| v_grade || ' Appraisal ' || v_appraisal);
+END;
+
+Create table Teste(nivel char(1));
+insert into Teste values ('A');
+insert into Teste values ('B');
+insert into Teste values ('C');
+
+
+CREATE TABLE MENSAGEM(msg Varchar2(100));
+
+
+Select * from Mensagem;
+
+DECLARE
+   V_NR INTEGER := 4;
+BEGIN
+ DELETE MENSAGEM;
+ IF MOD(V_NR, 2) = 0 THEN  
+   INSERT INTO MENSAGEM VALUES (V_NR || ' é par' );
+ ELSE
+   INSERT INTO MENSAGEM VALUES (V_NR || ' é impar');
+ END IF;
+END;
+
+
+DECLARE
+  V_NR INTEGER := 3;
+BEGIN
+  DELETE MENSAGEM;
+  CASE
+     WHEN MOD(V_NR, 2) = 0 THEN
+       INSERT INTO MENSAGEM VALUES (V_NR || ' é par');
+     ELSE
+      INSERT INTO MENSAGEM VALUES (V_NR || ' é impar');
+     END CASE;
+END;
+
+Select * from Mensagem;
+
+
+Create Table T1( e Integer, f Integer);
+
+
+DECLARE
+    i NUMBER := 1;
+BEGIN
+    --delete t1;
+     LOOP
+        INSERT INTO T1 VALUES(i,i);
+        i := i+1;
+        EXIT WHEN i>100;
+    END LOOP;
+END;
+
+delete t1;
+
+Select * from t1 where e> 50;
+
+delete t1;
+
+DECLARE
+    i NUMBER := 1;
+BEGIN
+    delete t1;
+     While i <= 100 LOOP
+        INSERT INTO T1 VALUES(i,i);
+        i := i+1;
+    END LOOP;
+END;
+
+Select * from t1;
+
+
+DECLARE
+  V_NR1 INTEGER := 1; -- declarando variável para loop
+  V_NR2 INTEGER := 1; -- declarando variável para while
+BEGIN
+  DELETE MENSAGEM; -- limpando a tabela  
+
+  LOOP --  inicio loop
+    INSERT INTO MENSAGEM VALUES (' loop - volta - ' || V_NR1);
+    EXIT WHEN V_NR1 = 10; --testando para sair
+    V_NR1 := V_NR1 + 1; -- incrementando a variável
+  END LOOP; -- fim loop
+
+  WHILE V_NR2 <= 10 LOOP -- inicio while
+    INSERT INTO MENSAGEM VALUES (' while - volta - ' || V_NR2);
+    V_NR2 := V_NR2 + 1; -- incrementando a variável
+  END LOOP; -- fim while
+  
+   FOR V_NR3 IN 1 .. 10 LOOP /* inicio for, repare que a variável 
+                               não precisa ser declarada nem incrementada */
+    INSERT INTO MENSAGEM VALUES ('for crescente - volta - ' || V_NR3);
+  END LOOP; -- fim do primeiro for
+
+  
+    FOR V_NR4 IN REVERSE 1 .. 10 LOOP -- for decrescente
+    INSERT INTO MENSAGEM VALUES ('for decrescente - volta - ' || V_NR4);
+  END LOOP;-- fim do segundo for
+  
+END;
+
+select * from mensagem;
+
+
+DECLARE
+  v_total SIMPLE_INTEGER := 0;
+BEGIN
+  FOR i IN 1..10 LOOP
+    v_total := v_total + i;
+    dbms_output.put_line (i || ' Total é: ' || v_total);
+    CONTINUE WHEN i> 5;
+    
+    v_total := v_total + i;
+    dbms_output.put_line (i || ' Fora do Loop p/ Continue:' || v_total);
+    
+  END LOOP;
+END;
+
+
+DECLARE
+  v_total NUMBER := 0;  
+  BEGIN
+  <<BeforeTopLoop>>
+  FOR i IN 1..10 LOOP
+    v_total := v_total + 1;  
+    dbms_output.put_line ('Total is: ' || v_total);  
+    FOR j IN 1..10 LOOP
+       CONTINUE BeforeTopLoop WHEN i + j > 5;  
+       v_total := v_total + 1;
+    END LOOP;
+  END LOOP;
+END two_loop;
+
+
+CREATE TABLE Relatorio(  nr number(8),  texto char(100) );
+
+Declare
+  V_nr relatorio.nr%type := 1000; -- declarando e inicializando a variável para o número
+Begin
+  Delete from relatorio;  -- limpando a tabela relatorio, não é um comando obrigatorio
+  Loop
+    If mod(v_nr,2) = 0 then -- testando se o número é par
+     -- inserindo na tabela relatorio o número par
+     Insert into relatorio values ( v_nr, 'Numero - ' || v_nr);
+    end if;
+    exit when v_nr = 1999;
+    v_nr := v_nr + 1;  -- incrementando o numero
+  End loop;
+  Commit;
+End;
+
+Select * from Relatorio where nr > 1950;
+
+
+
+
+Declare
+  V_nr relatorio.nr%type := 2000; -- declarando e inicializando a variável para o número
+Begin
+  Delete from relatorio;  -- limpando a tabela relatorio, não é um comando obrigatorio
+  While v_nr Between 2000 and 2999  loop
+     If mod(v_nr,2) = 0 then      -- testando se o número é par
+       -- inserindo na tabela relatorio o número par
+      insert into relatorio values ( v_nr, 'Numero - ' || v_nr);
+   end if;
+   v_nr := v_nr + 1;  -- incrementando o numero
+ end loop;
+ commit;
+end;
+
+
+Select * from Relatorio where nr > 2950;
+
+
+Begin
+  Delete from relatorio;  -- limpando a tabela relatório, não é um comando obrigatório
+  for  v_nr in 3000 .. 3999 loop -- estrutura de for que declara , incrementa e testa v_nr
+    if mod(v_nr,2) = 0 then      -- testando se o número é par
+          -- inserindo na tabela relatorio o número par
+          insert into relatorio values ( v_nr, 'Numero - ' || v_nr);
+    end if;
+    dbms_output.put_line ('Contador: ' || v_nr);  
+  end loop;
+  commit;
+end;
+
+Select * from Relatorio where nr > 3950;
+
+
+Begin
+  Delete from relatorio;  -- limpando a tabela relatório, não é um comando obrigatório
+  For  v_nr in reverse 4000 .. 4999 loop -- estrutura de for que declara , incrementa e testa v_nr
+    if mod(v_nr,2) = 0 then  -- testando se o número é par
+      -- inserindo na tabela relatorio o número par
+      insert into relatorio values ( v_nr, 'Numero - ' || v_nr);
+    end if;
+    dbms_output.put_line ('Contador: ' || v_nr); 
+  end loop;
+  commit;
+end;
+
+
+Select * from Relatorio where nr > 4950;

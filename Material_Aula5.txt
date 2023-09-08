@@ -1,0 +1,540 @@
+CREATE TABLE vendedor(
+	cod_vend     smallint     NOT NULL,
+	nome_vend    varchar(40)  NOT NULL,
+	sal_fixo     numeric(9,2) NOT NULL,
+	faixa_comiss char(1)      NOT NULL,
+        PRIMARY KEY (cod_vend));
+
+insert into vendedor 
+ (cod_vend, nome_vend, sal_fixo, faixa_comiss)
+  values 
+ (11, 'Paulo Alberto' , 1500, 'b');  
+insert into vendedor 
+ (cod_vend, nome_vend, sal_fixo, faixa_comiss)
+  values 
+ (12, 'Ana Cristina' , 2100, 'a');  
+insert into vendedor 
+ (cod_vend, nome_vend, sal_fixo, faixa_comiss)
+  values 
+ (13, 'Cassia Andrade' , 900, 'c');  
+insert into vendedor 
+ (cod_vend, nome_vend, sal_fixo, faixa_comiss)
+  values 
+ (14, 'Armando Pinto' , 2500, 'a');  
+insert into vendedor 
+ (cod_vend, nome_vend, sal_fixo, faixa_comiss)
+  values 
+ (15, 'Maria Paula' , 900, 'c');  
+
+
+ Select * from Vendedor;
+ 
+ 
+ 
+ 
+ 
+ CREATE OR REPLACE FUNCTION verifica_sal
+  RETURN BOOLEAN
+IS
+  v_empno vendedor.cod_vend%TYPE;
+  v_sal vendedor.sal_fixo%TYPE;
+  v_avg_sal vendedor.sal_fixo%TYPE;
+BEGIN
+  v_empno:=12;
+  SELECT sal_fixo INTO v_sal
+      FROM vendedor WHERE cod_vend = v_empno;
+  SELECT AVG(sal_fixo) INTO v_avg_sal
+      FROM vendedor;
+  IF v_sal  > v_avg_sal THEN
+    RETURN TRUE;
+  ELSE
+    RETURN FALSE;
+  END IF;
+EXCEPTION
+WHEN NO_DATA_FOUND THEN
+  RETURN NULL;
+END;
+
+
+BEGIN
+  IF (verifica_sal IS NULL) THEN
+    DBMS_OUTPUT.PUT_LINE('A função retornou NULL para a exceção!');
+  ELSIF (verifica_sal) THEN
+    DBMS_OUTPUT.PUT_LINE('Salario >  média');
+  ELSE
+    DBMS_OUTPUT.PUT_LINE('Salario <=  média');
+  END IF;
+END;
+
+  SELECT AVG(sal_fixo) FROM vendedor;
+  
+  
+  CREATE OR REPLACE FUNCTION 
+  verifica_sal2(p_empno vendedor.sal_fixo%TYPE)
+  RETURN BOOLEAN
+IS
+  v_sal vendedor.sal_fixo%TYPE;
+  v_avg_sal vendedor.sal_fixo%TYPE;
+BEGIN
+  SELECT sal_FIXO INTO v_sal
+    FROM Vendedor 
+    WHERE COD_VEND=p_empno;
+  SELECT AVG(sal_FIXO) INTO v_avg_sal
+    FROM vendedor;
+  IF v_sal > v_avg_sal THEN
+    RETURN TRUE;
+  ELSE
+    RETURN FALSE;
+  END IF;
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    RETURN NULL;
+END;
+
+      
+BEGIN
+  DBMS_OUTPUT.PUT_LINE('Verificando o vendedor 13');
+  IF (verifica_sal2(13) IS NULL) THEN
+      DBMS_OUTPUT.PUT_LINE('The function returned NULL due to exception');
+  ELSIF (verifica_sal2(13)) THEN
+    DBMS_OUTPUT.PUT_LINE('Salario >  média');
+  ELSE
+    DBMS_OUTPUT.PUT_LINE('Salario <=  média');
+  END IF;
+  DBMS_OUTPUT.PUT_LINE('Verificando o vendedor 14');
+  IF (verifica_sal2(14) IS NULL) THEN
+      DBMS_OUTPUT.PUT_LINE('The function returned NULL due to exception');
+  ELSIF (verifica_sal2(14)) THEN
+    DBMS_OUTPUT.PUT_LINE('Salario >  média');
+  ELSE
+    DBMS_OUTPUT.PUT_LINE('Salario <=  média');
+  END IF;
+END;
+
+
+
+
+
+CREATE OR REPLACE FUNCTION get_sal(p_id vendedor.cod_vend%TYPE)
+  RETURN NUMBER
+IS
+  v_sal vendedor.sal_fixo%TYPE := 0;
+BEGIN
+  SELECT sal_fixo INTO v_sal FROM vendedor WHERE cod_vend = p_id;
+  RETURN v_sal;
+END get_sal;
+
+CREATE OR REPLACE FUNCTION soma(p_v1 NUMBER, p_v2 NUMBER)
+  RETURN NUMBER
+IS
+BEGIN
+  RETURN p_v1 + p_v2;
+END soma;
+
+
+
+
+
+EXECUTE dbms_output.put_line(get_sal(13));
+EXECUTE dbms_output.put_line(get_sal(14));
+
+EXECUTE dbms_output.put_line(soma(4,6));
+
+
+CREATE OR REPLACE FUNCTION desconto_Inss(p_value IN NUMBER)
+  RETURN NUMBER
+IS
+BEGIN
+  RETURN (p_value * 0.08);
+END desconto_Inss;
+
+
+Select Cod_Vend, Nome_Vend, Sal_Fixo, Desconto_INSS(Sal_Fixo) from Vendedor;
+
+ Select * from Vendedor;
+
+
+CREATE OR REPLACE FUNCTION dml_call_sql(p_sal NUMBER)
+  RETURN NUMBER
+IS
+BEGIN
+  INSERT  INTO vendedor ( cod_vend, nome_vend, sal_fixo, faixa_comiss )
+    VALUES ( 16,  'João da Silva', p_sal, 'b' );
+  RETURN (p_sal);
+END;
+
+
+UPDATE vendedor SET sal_fixo =  dml_call_sql(2000) WHERE  cod_vend = 15;
+
+drop function dml_call_sql;
+
+CREATE OR REPLACE FUNCTION SAL_ANUAL(P_SAL NUMBER)
+  RETURN VARCHAR2
+IS
+  V_SAL_ANUAL REAL;
+  V_RESULT    VARCHAR2(100);
+BEGIN
+  V_SAL_ANUAL          := ROUND(P_SAL * 40 / 3, 2);
+  IF TRUNC(V_SAL_ANUAL) = ROUND(P_SAL * 40 / 3, 2) THEN
+    V_RESULT           := 'R$ ' || V_SAL_ANUAL || ',00';
+  ELSE
+    V_RESULT := 'R$ ' || V_SAL_ANUAL;
+  END IF;
+  RETURN V_RESULT;
+END;
+
+
+
+select sal_anual(1200) from dual;
+select sal_anual(900) from dual;
+select sal_anual(2200) from dual;
+select sal_anual(3300) from dual;
+select sal_anual(4100) from dual;
+select sal_anual(11200) from dual;
+
+select sal_fixo, sal_anual(sal_fixo) from vendedor; 
+
+CREATE OR REPLACE FUNCTION VALIDA_CPF1(
+    P_CPF VARCHAR2)
+  RETURN VARCHAR2
+AS
+  V_CPF  VARCHAR2(11) := SUBSTR(P_CPF, 1, 9);
+  V_SOMA NUMBER(11)   := 0;
+  V_DV   NUMBER(11);
+  V_MAX  NUMBER(11);
+  V_DG   VARCHAR2(1) := SUBSTR(P_CPF, 1, 1);
+  V_OK   BOOLEAN     := FALSE;
+BEGIN
+  IF LENGTH(P_CPF)<> 11 THEN
+    RETURN 'CPF COM QUANTIDADE DE DIGITOS ERRADA';
+  ELSE
+    FOR V_C IN 2 .. 11
+    LOOP
+      IF V_DG <> SUBSTR(P_CPF, V_C, 1) THEN
+        V_OK  := TRUE;
+        EXIT;
+      END IF;
+    END LOOP;
+  END IF;
+ IF V_OK THEN
+    FOR V_C IN 1 .. 2
+    LOOP
+      V_MAX := LENGTH(V_CPF);
+      FOR V_I IN 1 .. V_MAX
+      LOOP
+        V_SOMA := V_SOMA + 
+                (TO_NUMBER(SUBSTR(V_CPF, V_I, 1)) * (V_I + 9 - V_MAX));
+      END LOOP;
+      V_DV   := MOD(MOD(V_SOMA, 11), 10);
+      V_CPF  := V_CPF || TO_CHAR(V_DV);
+      V_SOMA := 0;
+    END LOOP;
+    IF P_CPF <> V_CPF THEN
+      RETURN 'CPF INVALIDO';
+    ELSE
+      RETURN 'CPF VÁLIDO';
+    END IF;
+  ELSE
+    RETURN 'CPF COM TODOS OS DIGITOS IGUAIS';
+  END IF;
+END;
+
+
+
+
+CREATE OR REPLACE FUNCTION VALIDA_CPF2(P_CPF VARCHAR2) RETURN VARCHAR2 AS
+  V_CPF VARCHAR2(11) := SUBSTR(P_CPF, 1, 9);
+  V_SOMA NUMBER(11) := 0;
+  V_DV NUMBER(11);
+  V_DG VARCHAR2(1) := SUBSTR(P_CPF, 1, 1);
+BEGIN
+  IF LENGTH(P_CPF) <> 11 THEN
+     RETURN 'CPF COM QUANTIDADE DE DIGITOS ERRADA';
+  ELSE
+    FOR V_C IN 2 .. 11 LOOP
+      IF V_DG <>SUBSTR(P_CPF, V_C, 1) THEN
+        EXIT;
+      ELSIF V_C = 11 THEN
+        RETURN 'CPF COM TODOS OS DIGITOS IGUAIS';
+      END IF;
+    END LOOP;
+  END IF;
+    FOR V_C IN 0 .. 1  LOOP
+      FOR V_I IN 1 .. 9 + V_C  LOOP
+        V_SOMA := V_SOMA + (TO_NUMBER(SUBSTR(V_CPF, V_I, 1)) * (V_I - V_C));
+      END LOOP;
+        V_DV := MOD(MOD(V_SOMA, 11), 10);
+        V_CPF := V_CPF || TO_CHAR(V_DV);
+        V_SOMA := 0;
+        IF V_DV <> SUBSTR(P_CPF, 10 + V_C, 1) THEN
+            RETURN 'CPF INVALIDO';
+        END IF;
+  END LOOP;
+  RETURN 'CPF VÁLIDO';
+END;
+  
+  
+CREATE OR REPLACE FUNCTION VALIDA_CPF3(P_CPF VARCHAR2)
+  RETURN VARCHAR2 IS
+  V_CPF1  CHAR := SUBSTR(P_CPF, 1, 1);
+  V_CPF2  CHAR := SUBSTR(P_CPF, 2, 1);
+  V_CPF3  CHAR := SUBSTR(P_CPF, 3, 1);
+  V_CPF4  CHAR := SUBSTR(P_CPF, 4, 1);
+  V_CPF5  CHAR := SUBSTR(P_CPF, 5, 1);
+  V_CPF6  CHAR := SUBSTR(P_CPF, 6, 1);
+  V_CPF7  CHAR := SUBSTR(P_CPF, 7, 1);
+  V_CPF8  CHAR := SUBSTR(P_CPF, 8, 1);
+  V_CPF9  CHAR := SUBSTR(P_CPF, 9, 1);
+  V_CPF10 CHAR := SUBSTR(P_CPF, 10, 1);
+  V_CPF11 CHAR := SUBSTR(P_CPF, 11, 1);
+  V_TOT NUMBER(5) := 0;
+  V_DG  CHAR(1);
+BEGIN
+    IF LENGTH(P_CPF) <> 11 THEN
+        RETURN 'CPF COM QUANTIDADE DE DIGITOS ERRADA';
+    ELSIF      (V_CPF1 = V_CPF2) AND (V_CPF2 = V_CPF3) AND (V_CPF3 = V_CPF4)
+         AND (V_CPF4 = V_CPF5) AND (V_CPF5 = V_CPF6) AND (V_CPF6 = V_CPF7)
+         AND (V_CPF7 = V_CPF8) AND (V_CPF8 = V_CPF9) AND (V_CPF9 = V_CPF10)
+         AND (V_CPF10 = V_CPF11) THEN
+           RETURN 'CPF COM TODOS OS DIGITOS IGUAIS';
+           
+    ELSE
+      V_TOT := (V_CPF1 * 1) + (V_CPF2 * 2) + (V_CPF3 * 3) + (V_CPF4 * 4) 
+           + (V_CPF5 * 5) + (V_CPF6 * 6) + (V_CPF7 * 7) + (V_CPF8 * 8) 
+           + (V_CPF9 * 9);
+      V_DG  := MOD(MOD(V_TOT, 11), 10);
+      IF V_DG <> V_CPF10 THEN
+         RETURN 'CPF INVALIDO';
+      END IF;
+      V_TOT := 0;
+      V_TOT := (V_CPF1 * 0) + (V_CPF2 * 1) + (V_CPF3 * 2) + (V_CPF4 * 3) 
+           + (V_CPF5 * 4) + (V_CPF6 * 5) + (V_CPF7 * 6) + (V_CPF8 * 7) 
+           + (V_CPF9 * 8) + (V_CPF10 * 9);
+      V_DG := MOD(MOD(V_TOT, 11), 10);
+      IF V_DG <> V_CPF11 THEN
+        RETURN 'CPF INVALIDO';
+      END IF;
+    END IF;
+    RETURN 'CPF VALIDO';
+    END VALIDA_CPF3;
+
+
+select valida_cpf1(15338481570) from dual;
+select valida_cpf1(77777777777) from dual;
+select valida_cpf1(12345678977) from dual;
+select valida_cpf1(1234567897) from dual;
+select valida_cpf1(123456789789) from dual;
+
+select valida_cpf2(15338481570) from dual;
+select valida_cpf2(77777777777) from dual;
+select valida_cpf2(12345678977) from dual;
+select valida_cpf2(1234567897) from dual;
+select valida_cpf1(123456789789) from dual;
+
+select valida_cpf3(15338481570) from dual;
+select valida_cpf3(77777777777) from dual;
+select valida_cpf3(12345678977) from dual;
+select valida_cpf3(1234567897) from dual;
+select valida_cpf1(123456789789) from dual;
+
+
+Create table emp_relatorio 
+(id_emp number(15), 
+nome_emp varchar2(100), 
+nome_Depto varchar2(50)); 
+
+
+
+CREATE TABLE depto 
+(id                         NUMBER(7), 
+ nome                       VARCHAR2(15) 
+   CONSTRAINT depto_nome_nn NOT NULL,
+ id_regiao                  NUMBER(7),
+     CONSTRAINT id_depto_pk PRIMARY KEY (id),
+     CONSTRAINT depto_nome_id_regiao_uk UNIQUE (nome, id_regiao));
+
+INSERT INTO depto VALUES (
+   10, 'Financeiro', 1);
+INSERT INTO depto VALUES (
+   31, 'Vendas', 1);
+INSERT INTO depto VALUES (
+   32, 'Vendas', 2);
+INSERT INTO depto VALUES (
+   33, 'Vendas', 3);
+INSERT INTO depto VALUES (
+   34, 'Vendas', 4);
+INSERT INTO depto VALUES (
+   35, 'Vendas', 5);
+INSERT INTO depto VALUES (
+   41, 'Operações', 1);
+INSERT INTO depto VALUES (
+   42, 'Operações', 2);
+INSERT INTO depto VALUES (
+   43, 'Operações', 3);
+INSERT INTO depto VALUES (
+   44, 'Operações', 4);
+INSERT INTO depto VALUES (
+   45, 'Operações', 5);
+INSERT INTO depto VALUES (
+   50, 'Administrativo', 1);
+COMMIT;
+
+
+
+CREATE TABLE empregado 
+(id                         NUMBER(7), 
+ ult_nome                  VARCHAR2(20) 
+   CONSTRAINT empregado_ult_nome_nn NOT NULL,
+ prim_nome                 VARCHAR2(15),
+ senha                     VARCHAR2(8),
+ dt_admissao                 DATE,
+ comentarios                   VARCHAR2(50),
+ id_gerente                 NUMBER(7),
+ cargo                   VARCHAR2(25),
+ id_depto                    NUMBER(7),
+ salario                     NUMBER(11, 2),
+ percomissao             NUMBER(4, 2),
+     CONSTRAINT empregado_id_pk PRIMARY KEY (id),
+     CONSTRAINT empregado_senha_uk UNIQUE (senha),
+     CONSTRAINT empregado_percomissao_ck
+        CHECK (percomissao IN (10, 12.5, 15, 17.5, 20)));
+
+INSERT INTO empregado VALUES (
+  1, 'Velasquez', 'Carmen', 'cvelasqu',
+   '03-MAR-90', NULL, NULL, 'Presidente',
+   50, 2500, NULL);
+INSERT INTO empregado VALUES (
+   2, 'Neves', 'Lauro', 'lngao',
+   '08-MAR-90', NULL, 1,'VP, Operações',
+   41, 1450, NULL);
+INSERT INTO empregado VALUES (
+   3, 'Nogueira', 'Mário', 'mnagayam',
+   '17-JUN-91', NULL, 1, 'VP, Vendas',
+   31, 1400, NULL);
+INSERT INTO empregado VALUES (
+   4, 'Queiroz', 'Mark', 'mquickto', 
+   '07-abr-90', NULL, 1, 'VP, Financeiro', 
+   10, 1450, NULL);
+INSERT INTO empregado VALUES (
+   5, 'Rodrigues', 'Alberto', 'aropebur',
+   '04-MAR-90', NULL, 1, 'VP, Administrativo',
+   50, 1550, NULL);
+INSERT INTO empregado VALUES (
+   6, 'Ugarte', 'Marlene', 'murguhar',
+   '18-JAN-91', NULL, 2, 'Gerente de Almoxarifado',
+   41, 1200, NULL);
+INSERT INTO empregado VALUES (
+   7, 'Machado', 'Roberto', 'rmenchu',
+   '14-mai-90', NULL, 2, 'Gerente de Almoxarifado',
+   42, 1250, NULL);
+INSERT INTO empregado VALUES (
+   8, 'Bastos', 'Bernardo', 'bbiri',
+   '07-abr-90', NULL, 2, 'Gerente de Almoxarifado',
+   43, 1100, NULL);
+INSERT INTO empregado VALUES (
+   9, 'Camargo', 'Antonio', 'acatchpo',
+   '09-fev-92', NULL, 2, 'Gerente de Almoxarifado',
+   44, 1300, NULL);
+INSERT INTO empregado VALUES (
+   10, 'Hubert', 'Marta', 'mhubert',
+   '27-fev-91', NULL, 2, 'Gerente de Almoxarifado',
+   45, 1307, NULL);
+INSERT INTO empregado VALUES (
+   11, 'Margarida', 'Carla', 'cmagee',
+   '14-mai-90', NULL, 3, 'Representante de Vendas',
+   31, 1400, 10);
+INSERT INTO empregado VALUES (
+   12, 'Guimarães', 'Henrique', 'hgiljum',
+   '18-JAN-92', NULL, 3, 'Representante de Vendas',
+   32, 1490, 12.5);
+INSERT INTO empregado VALUES (
+   13, 'Sedeghi', 'Yasmin', 'ysedeghi',
+   '18-fev-91', NULL, 3, 'Representante de Vendas',
+   33, 1515, 10);
+INSERT INTO empregado VALUES (
+   14, 'Nice', 'Maria', 'mnguyen',
+   '22-JAN-92', NULL, 3, 'Representante de Vendas',
+   34, 1525, 15);
+INSERT INTO empregado VALUES (
+   15, 'Dumas', 'Andre', 'adumas',
+   '09-out-91', NULL, 3, 'Representante de Vendas',
+   35, 1450, 17.5);
+INSERT INTO empregado VALUES (
+   16, 'Madeira', 'Elena', 'emaduro',
+   '07-fev-92', NULL, 6, 'Almoxarife',
+   41, 1400, NULL);
+INSERT INTO empregado VALUES (
+   17, 'Silva', 'George', 'gsmith',
+   '08-MAR-90', NULL, 6, 'Almoxarife',
+   41, 940, NULL);
+INSERT INTO empregado VALUES (
+   18, 'Nozaki', 'Arnaldo', 'anozaki',
+   '09-fev-91', NULL, 7, 'Almoxarife',
+   42, 1200, NULL);
+INSERT INTO empregado VALUES (
+   19, 'Pires', 'Vitor', 'vpatel',
+   '06-ago-91', NULL, 7, 'Almoxarife',
+   42, 795, NULL);
+INSERT INTO empregado VALUES (
+   20, 'Newman', 'Claudia', 'cnewman',
+   '21-JUL-91', NULL, 8, 'Almoxarife',
+   43, 750, NULL);
+INSERT INTO empregado VALUES (
+   21, 'Martins', 'Alexander', 'amarkari',
+   '26-mai-91', NULL, 8, 'Almoxarife',
+   43, 850, NULL);
+INSERT INTO empregado VALUES (
+   22, 'Chang', 'Eduardo', 'echang',
+   '30-NOV-90', NULL, 9, 'Almoxarife',
+   44, 800, NULL);
+INSERT INTO empregado VALUES (
+   23, 'Pires', 'Rita', 'rpatel',
+   '17-out-90', NULL, 9, 'Almoxarife',
+   34, 795, NULL);
+INSERT INTO empregado VALUES (
+   24, 'Dantas', 'Beatriz', 'bdancs',
+   '17-MAR-91', NULL, 10, 'Almoxarife',
+   45, 860, NULL);
+INSERT INTO empregado VALUES (
+   25, 'Schwartz', 'Silvia', 'sschwart',
+   '09-mai-91', NULL, 10, 'Almoxarife',
+   45, 1100, NULL);
+COMMIT;
+
+
+
+
+
+
+CREATE OR REPLACE FUNCTION func_relat_emp (p_id NUMBER)
+  RETURN NUMBER
+IS
+  v_nome_dep depto.nome%type;
+  v_qtd NUMBER(10);
+  CURSOR empregado (P_dep NUMBER)
+  IS
+    SELECT id, prim_nome || ' ' || ult_nome AS nome_emp
+    FROM empregado
+    WHERE id_Depto = p_dep;
+BEGIN
+  SELECT nome INTO v_nome_dep FROM depto WHERE id = p_id;
+  FOR r_emp IN empregado(p_id)
+  LOOP
+    INSERT INTO emp_relatorio VALUES
+      (r_emp.id, r_emp.nome_emp, v_nome_dep);
+      v_qtd := empregado%rowcount;
+  END LOOP;
+  COMMIT;
+  RETURN v_qtd;
+end func_relat_emp;
+
+
+EXECUTE dbms_output.put_line(func_relat_emp(31));
+EXECUTE dbms_output.put_line(func_relat_emp(32));
+EXECUTE dbms_output.put_line(func_relat_emp(33));
+EXECUTE dbms_output.put_line(func_relat_emp(34));
+EXECUTE dbms_output.put_line(func_relat_emp(35));
+  
+
+Select * from emp_relatorio;
+      

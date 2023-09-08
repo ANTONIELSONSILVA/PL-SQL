@@ -1,0 +1,306 @@
+Create table depto( id number, descricao varchar2(40));
+
+CREATE OR REPLACE PROCEDURE add_depto
+IS
+  v_dept_id depto.id%TYPE;
+  v_dept_name depto.descricao%TYPE;
+BEGIN
+  v_dept_id  :=310;
+  v_dept_name:='Contabilidade';
+  INSERT INTO depto (id, descricao) 
+    VALUES (v_dept_id, v_dept_name);
+  DBMS_OUTPUT.PUT_LINE(' Inserido: '|| SQL%ROWCOUNT ||' linha(s) ');
+END;
+
+select * from depto;
+
+EXECUTE add_depto;
+
+BEGIN
+    add_depto;
+END;
+
+CREATE TABLE vendedor(
+	cod_vend     smallint     NOT NULL,
+	nome_vend    varchar(40)  NOT NULL,
+	sal_fixo     numeric(9,2) NOT NULL,
+	faixa_comiss char(1)      NOT NULL,
+        PRIMARY KEY (cod_vend));
+        
+insert into vendedor 
+ (cod_vend, nome_vend, sal_fixo, faixa_comiss)
+  values 
+ (11, 'Paulo Alberto' , 1500, 'b');  
+insert into vendedor 
+ (cod_vend, nome_vend, sal_fixo, faixa_comiss)
+  values 
+ (12, 'Ana Cristina' , 2100, 'a');  
+insert into vendedor 
+ (cod_vend, nome_vend, sal_fixo, faixa_comiss)
+  values 
+ (13, 'Cassia Andrade' , 900, 'c');  
+insert into vendedor 
+ (cod_vend, nome_vend, sal_fixo, faixa_comiss)
+  values 
+ (14, 'Armando Pinto' , 2500, 'a');  
+insert into vendedor 
+ (cod_vend, nome_vend, sal_fixo, faixa_comiss)
+  values 
+ (15, 'Maria Paula' , 900, 'c'); 
+ 
+ 
+ Select * from Vendedor;
+ 
+ create or replace PROCEDURE atualiza_salario
+(p_id IN Vendedor.cod_vend%TYPE,  p_percent IN NUMBER)
+IS
+BEGIN
+  UPDATE Vendedor SET  sal_fixo = sal_fixo * (1 + p_percent/100) 
+    WHERE COD_VEND = p_id;
+END atualiza_salario;
+
+
+
+EXECUTE atualiza_salario(15, 50);
+
+ Select * from Vendedor;
+ 
+create or replace PROCEDURE consulta_vendedor
+(p_id	IN Vendedor.cod_vend%TYPE,  
+ p_nome OUT VENDEDOR.NOME_VEND%type,
+ p_salario OUT VENDEDOR.SAL_FIXO%type)
+IS
+BEGIN
+  SELECT nome_vend, sal_fixo into p_nome, p_salario
+  from Vendedor  WHERE COD_VEND = p_id;
+END consulta_vendedor;
+
+
+
+
+DECLARE
+  v_emp_name  VENDEDOR.NOME_VEND%TYPE; 
+  v_emp_sal	VENDEDOR.SAL_FIXO%TYPE;
+BEGIN
+  consulta_vendedor(15, v_emp_name, v_emp_sal);
+  DBMS_OUTPUT.PUT_LINE(v_emp_name ||' salário=  R'||  trim(	to_char(v_emp_sal, '$999,999.00')));
+END;
+
+
+
+
+CREATE OR REPLACE PROCEDURE formata_phone  (p_phone_no IN OUT Varchar2) IS
+BEGIN
+p_phone_no := '(' || SUBSTR(p_phone_no,1,3) || 
+              ')' || SUBSTR(p_phone_no,4,3) || 
+              '-' || SUBSTR(p_phone_no,7);
+End formata_phone;
+        
+DECLARE
+    v Varchar2(20);
+BEGIN
+    v:='8006330575';
+    formata_phone (v);
+    DBMS_OUTPUT.PUT_LINE(v); 
+END;
+
+
+
+
+
+CREATE OR REPLACE PROCEDURE formata_phoneB  (p_phone_no IN OUT Varchar2) IS
+BEGIN
+p_phone_no := '(' || SUBSTR(p_phone_no,1,2) || 
+              ')' || SUBSTR(p_phone_no,3,5) || 
+              '-' || SUBSTR(p_phone_no,8,4);
+End formata_phoneB;
+        
+DECLARE
+    v Varchar2(20);
+BEGIN
+    v:='21987654321';
+    formata_phoneB (v);
+    DBMS_OUTPUT.PUT_LINE(v); 
+END;
+
+
+
+DECLARE
+v_emp_name vendedor.nome_vend%TYPE;  v_emp_sal	vendedor.sal_fixo%TYPE;
+BEGIN
+    consulta_vendedor(11, v_emp_name, v_emp_sal);  
+    DBMS_OUTPUT.PUT_LINE('Nome: ' || v_emp_name);  
+    DBMS_OUTPUT.PUT_LINE('Salário: ' || v_emp_sal);
+END;
+
+
+
+CREATE OR REPLACE PROCEDURE  processa_vendedor
+IS
+   CURSOR cur_vend_cursor  IS SELECT  cod_vend FROM  vendedor;
+BEGIN
+   FOR vend_reg IN  cur_vend_cursor LOOP
+      DBMS_OUTPUT.PUT_LINE('Código: ' || vend_reg.cod_vend);
+   END  LOOP;  
+  
+END processa_vendedor;
+
+Execute processa_vendedor;
+
+Drop procedure processa_vendedor;
+
+CREATE TABLE T2 (    
+    a INTEGER,
+    b CHAR(10)        );
+
+CREATE OR REPLACE PROCEDURE addtuple1(i IN NUMBER) IS
+BEGIN
+INSERT INTO T2 VALUES(i, 'xxx');
+END addtuple1;
+        
+EXECUTE addtuple1(10);  
+EXECUTE addtuple1(11); 
+EXECUTE addtuple1(12); 
+EXECUTE addtuple1(13); 
+EXECUTE addtuple1(14); 
+
+BEGIN    
+ addtuple1(99); 
+END;
+
+        
+Select * from T2;
+
+
+CREATE PROCEDURE addtuple2(
+    x T2.a%TYPE,
+    y T2.b%TYPE) 
+AS
+BEGIN
+    INSERT INTO T2(a, b)    VALUES(x, y);
+END addtuple2;
+
+BEGIN
+    addtuple2(100, 'abc');
+END;
+
+Execute addtuple2(200, 'def');
+
+Select * from t2;
+
+
+CREATE TABLE T3 (     a INTEGER,     b INTEGER         );
+
+CREATE OR REPLACE PROCEDURE  addtuple3(a NUMBER, b OUT NUMBER)
+AS
+BEGIN
+    b := 6;
+    INSERT INTO T3 VALUES(a, b);
+END;
+
+DECLARE
+    v NUMBER;
+BEGIN
+    addtuple3(108, v);
+    DBMS_OUTPUT.PUT_LINE(v);
+    
+END;
+ 
+ 
+Select * from t3; 
+ 
+create table DESCONTO ( cod_produto Number, perc_desconto Number);
+
+insert into desconto values (101, 10);
+
+Select * from Desconto;
+
+CREATE OR REPLACE PROCEDURE CALCULA_DESCONTO
+(COD_PROD IN NUMBER, VALOR_VENDA IN NUMBER,
+NOVO_VALOR_VENDA OUT NUMBER) AS
+PERCENTUAL INT;
+BEGIN
+	SELECT PERC_DESCONTO INTO PERCENTUAL
+		FROM DESCONTO
+		WHERE COD_PRODUTO = COD_PROD;
+	NOVO_VALOR_VENDA := VALOR_VENDA - (VALOR_VENDA * PERCENTUAL / 100);
+END;
+
+DECLARE
+    valor NUMBER;
+BEGIN
+    CALCULA_DESCONTO(101, 1000, valor);
+    DBMS_OUTPUT.PUT_LINE(valor);
+    
+END;
+
+
+create table PRODUTO2 ( pn number, pnome varchar(30), qtde_estoque number, 
+  preco_unitario number, local_fab varchar(30));
+  
+insert into produto2 values (101, 'Bala azul', 10, 5, 'Niterói'); 
+  
+CREATE OR REPLACE PROCEDURE TRATAR_ESTOQUE(
+    COD_PROD      IN NUMBER,
+    QUANT_VENDIDA IN NUMBER,
+    STATUS OUT NUMBER)
+AS
+  ESTOQUE number;
+BEGIN
+  SELECT QTDE_ESTOQUE INTO ESTOQUE FROM PRODUTO2 WHERE PN=COD_PROD FOR UPDATE;
+  IF ESTOQUE >= QUANT_VENDIDA THEN
+    UPDATE PRODUTO2
+      SET QTDE_ESTOQUE = QTDE_ESTOQUE - QUANT_VENDIDA
+      WHERE PN         = COD_PROD;
+    STATUS := 0;
+  ELSE
+    STATUS := 1;
+  END IF;
+END;
+
+DECLARE
+    status NUMBER;
+BEGIN
+    TRATAR_ESTOQUE(101, 5, status);
+    DBMS_OUTPUT.PUT_LINE(status);
+    
+END;
+
+select * from PRODUTO2 ;
+
+
+
+CREATE OR REPLACE PROCEDURE ReajustarSalarial(
+    Salario IN OUT NUMBER, PercentualReajuste IN Number)
+AS
+BEGIN
+    Salario := Salario + Salario * PercentualReajuste / 100;
+END;
+
+
+
+DECLARE
+    novoSalario NUMBER;
+BEGIN
+    novoSalario:=4000;
+    ReajustarSalarial(novoSalario, 10);
+    DBMS_OUTPUT.PUT_LINE(novoSalario);
+    
+END;
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+

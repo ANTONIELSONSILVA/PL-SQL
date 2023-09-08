@@ -1,0 +1,74 @@
+Create table Aluno (matricula int , nome char(20), codigo_curso char(2));
+
+INSERT INTO Aluno VALUES (1,'Carlos', 'T');
+INSERT INTO Aluno VALUES (2,'Andre', 'C');
+INSERT INTO Aluno VALUES (3,'Maria', 'T');
+INSERT INTO Aluno VALUES (4,'Carla', 'C');
+INSERT INTO Aluno VALUES (5,'Carla', 'C');
+
+DECLARE
+v_nome CHAR(20); 
+BEGIN
+  SELECT nome INTO  v_nome FROM Aluno WHERE nome='Carlos';
+  DBMS_OUTPUT.PUT_LINE ('Seu nome é :'  || v_nome); 
+END;
+
+DECLARE
+v_nome CHAR(20); 
+BEGIN
+  SELECT nome INTO  v_nome FROM Aluno WHERE nome='Carla';
+  DBMS_OUTPUT.PUT_LINE ('Seu nome é :'  || v_nome); 
+END;
+
+
+
+DECLARE
+v_nome CHAR(20); 
+BEGIN
+  SELECT nome INTO  v_nome FROM Aluno WHERE nome='Carla';
+  DBMS_OUTPUT.PUT_LINE ('Seu nome é :'  || v_nome); 
+  
+EXCEPTION
+    WHEN TOO_MANY_ROWS THEN
+       DBMS_OUTPUT.PUT_LINE (' Você selecionou múltiplas linhas. Considere usar um cursor.');
+END;
+
+
+
+Create table Mensagem (mensagem varchar2(100));
+
+Create table Empr (nome Varchar2(20), cargo varchar2(20));
+
+insert into Empr values ('Carlos' , 'Professor');
+insert into Empr values ('Adriana' , 'Professor');
+insert into Empr values ('Maria' , 'Auxiliar');
+
+Select * from empr;
+Select * from mensagem;
+
+
+CREATE OR REPLACE PROCEDURE INTERIOR(P_CARGO VARCHAR2) AS
+  R_EMP EMPR%ROWTYPE;
+BEGIN
+  SELECT *  INTO R_EMP FROM EMPR
+     WHERE UPPER(CARGO) = UPPER(P_CARGO);
+  INSERT INTO MENSAGEM  VALUES (R_EMP.NOME);
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    INSERT INTO MENSAGEM  VALUES ('não existe empregados de cargo - ' || P_CARGO);
+END;
+
+
+CREATE OR REPLACE PROCEDURE EXTERIOR(P_CARGO VARCHAR2) AS
+BEGIN
+  INTERIOR(P_CARGO);
+EXCEPTION
+WHEN TOO_MANY_ROWS THEN
+  INSERT INTO MENSAGEM VALUES ('existem muitos empregados de cargo - ' || P_CARGO);
+END;
+
+
+Execute EXTERIOR('Auxiliar');
+Select * from mensagem;
+Execute EXTERIOR('Porteiro');
+Execute EXTERIOR('Professor');

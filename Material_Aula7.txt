@@ -1,0 +1,270 @@
+CREATE TABLE T4 (a INTEGER, b CHAR(10));
+
+CREATE TABLE T5 (c CHAR(10), d INTEGER);
+
+CREATE OR REPLACE TRIGGER trig1 
+AFTER INSERT ON T4 FOR EACH ROW WHEN (NEW.a <= 10) 
+
+BEGIN
+  INSERT INTO T5 VALUES (:NEW.b, :NEW.a*2);
+END trig1;
+
+Para testar:
+insert into t4 values (5,'Texto1');
+insert into t4 values (15,'Texto2');
+insert into t4 values (9,'Texto3');
+
+SELECT * FROM t4;
+SELECT * FROM t5;
+
+create table Empregado(
+  matric int,
+  nome char(20),
+  salario int, 
+  dept char(3)
+);
+
+create table Hist_Empregado( 
+   usuario char(50),
+   data_delecao date
+);
+
+Drop table Hist_Empregado;
+
+
+CREATE OR REPLACE TRIGGER HISTORICO
+	BEFORE DELETE ON EMPREGADO
+BEGIN
+	INSERT INTO HIST_EMPREGADO VALUES (USER, SYSDATE );
+END HISTORICO;
+
+INSERT INTO EMPREGADO VALUES   (11, 'Maria', 8000, 'A');
+INSERT INTO EMPREGADO VALUES   (12, 'Andre', 4000, 'B' );
+INSERT INTO EMPREGADO VALUES   (13, 'Ana', 600, 'C' );  
+INSERT INTO EMPREGADO VALUES   (14, 'Joao', 5000, 'D' );  
+  
+SELECT * FROM EMPREGADO;
+
+SELECT * FROM HIST_EMPREGADO;
+
+
+ delete FROM EMPREGADO e WHERE e.matric = 11;
+  
+  SELECT * FROM EMPREGADO;
+  
+  SELECT * FROM HIST_EMPREGADO;
+
+
+Drop table Hist_Empregado;
+
+create table Hist_Empregado( 
+   usuario char(50),
+   data_delecao date,
+   matric int
+);
+
+
+  
+CREATE OR REPLACE TRIGGER HISTORICO
+AFTER DELETE ON EMPREGADO FOR EACH ROW WHEN (OLD.matric >= 0) 
+BEGIN
+INSERT INTO HIST_EMPREGADO VALUES (USER, SYSDATE, :OLD.matric );
+END HISTORICO;
+
+
+delete FROM EMPREGADO e WHERE e.matric = 13;
+
+
+SELECT * FROM EMPREGADO;
+SELECT * FROM HIST_EMPREGADO;
+
+
+
+
+CREATE OR REPLACE TRIGGER TESTA_SALARIO 
+BEFORE INSERT OR
+     UPDATE ON EMPREGADO FOR EACH ROW 
+BEGIN 
+   IF :NEW.SALARIO < 10000 
+     THEN RAISE_APPLICATION_ERROR (-20001, ' Salario fora do limite ');
+   END IF;
+END TESTA_SALARIO;
+
+  SELECT * FROM EMPREGADO;
+
+INSERT INTO EMPREGADO VALUES (15, 'Mario', 18000, 'A');
+INSERT INTO EMPREGADO VALUES (16, 'Ana ', 8000, 'B');
+
+  SELECT * FROM EMPREGADO;
+ 
+Create table Venda (cod_cli int, cod_pro int , quantidade int);
+
+Create table Hist_Venda (cn char(10),pn char(10),qtd int,usu char(50),
+   oper char(1));
+
+Drop table Hist_Venda;
+
+CREATE OR REPLACE TRIGGER HISTORICO2
+BEFORE DELETE OR INSERT OR UPDATE ON VENDA
+FOR EACH ROW
+BEGIN
+  IF INSERTING THEN
+	INSERT INTO HIST_VENDA VALUES (:NEW.COD_CLI, :NEW.COD_PRO,:NEW.QUANTIDADE, USER,'I');
+  ELSIF DELETING THEN
+	INSERT INTO HIST_VENDA VALUES (:OLD.COD_CLI,:OLD.COD_PRO,:OLD.QUANTIDADE, USER,'D');
+  ELSE
+	INSERT INTO HIST_VENDA VALUES (:OLD.COD_CLI,:OLD.COD_PRO,:OLD.QUANTIDADE, USER,'U');
+	INSERT INTO HIST_VENDA VALUES (:NEW.COD_CLI,:NEW.COD_PRO,:NEW.QUANTIDADE, USER, 'U');
+  END IF;
+END HISTORICO;
+
+  
+SELECT * FROM VENDA;
+SELECT * FROM HIST_VENDA;
+
+INSERT INTO Venda VALUES (1,1,1);
+SELECT * FROM VENDA;
+SELECT * FROM HIST_VENDA;
+
+Update Venda set QUANTIDADE=3 Where cod_cli = 1;
+SELECT * FROM VENDA;
+SELECT * FROM HIST_VENDA;
+
+Delete venda Where cod_cli = 1;
+
+SELECT * FROM VENDA;
+SELECT * FROM HIST_VENDA;
+
+
+Create table Aluno (matricula int , nome char(20), codigo_curso char(2));
+
+Create table Delecao (usuario char(50), qtd int, data date);
+
+
+
+CREATE OR REPLACE TRIGGER HISTORICO3 AFTER DELETE ON ALUNO 
+  FOR EACH ROW
+DECLARE 
+  TOT INT;
+BEGIN
+	SELECT COUNT(*) INTO TOT FROM DELECAO WHERE USUARIO=USER;
+	IF TOT=0 THEN
+		INSERT INTO DELECAO VALUES(USER, 0,SYSDATE);
+	END IF;
+	UPDATE DELECAO SET QTD=QTD+1 WHERE USUARIO=USER;
+END;
+
+INSERT INTO Aluno VALUES (1,'Carlos', 'T');
+INSERT INTO Aluno VALUES (2,'Andre', 'C');
+INSERT INTO Aluno VALUES (3,'Maria', 'T');
+INSERT INTO Aluno VALUES (4,'Carla', 'C');
+
+Select * from Aluno;
+
+Select * from Delecao;
+
+
+Delete Aluno Where matricula = 1;
+Delete Aluno Where matricula = 2;
+
+Select * from Delecao;
+
+Delete Aluno Where matricula = 3;
+Delete Aluno Where matricula = 4;
+
+Select * from Delecao;
+
+CREATE OR REPLACE TRIGGER HISTORICO4 AFTER DELETE ON ALUNO 
+FOR EACH ROW
+DECLARE USU CHAR(50);
+BEGIN
+	SELECT USUARIO INTO USU FROM DELECAO WHERE USUARIO=USER;
+	UPDATE DELECAO SET QTD=QTD+1 WHERE USUARIO=USER;
+EXCEPTION
+	WHEN NO_DATA_FOUND THEN
+	INSERT INTO DELECAO VALUES(USER,1,SYSDATE);
+END;
+
+
+INSERT INTO Aluno VALUES (1,'Carlos', 'T');
+INSERT INTO Aluno VALUES (2,'Andre', 'C');
+INSERT INTO Aluno VALUES (3,'Maria', 'T');
+INSERT INTO Aluno VALUES (4,'Carla', 'C');
+
+Select * from Aluno;
+Select * from Delecao;
+
+Delete Aluno Where matricula = 1;
+Delete Aluno Where matricula = 2;
+Select * from Delecao;
+
+Alter TRIGGER HISTORICO3 disable;
+
+Delete Aluno Where matricula = 3;
+Delete Aluno Where matricula = 4;
+Select * from Delecao;
+
+Create table conta_corrente (nr number(6) primary key, nome varchar2(40), CPF char(11),saldo number(11,2));
+Create table mov_cc (nr number(9) primary key, nr_cc number(6) references conta_corrente(nr), tipo char(1) not null, valor number(11,2));
+
+insert into conta_corrente values(101,'Carlos Rodrigues','12345678901',1020.45);
+insert into conta_corrente values(111,'Jose Antonio Silva','67890154368',2045);
+insert into conta_corrente values(121,'Carla Santos' ,'45698712345',3120.89);
+insert into conta_corrente values(131,'Roberto Leitão','12345678901',120);
+insert into conta_corrente values(141,'Alberto Cesar','12345678901',2110.20);
+insert into conta_corrente values(151,'Caio Domingues','12345678901',1000);
+
+Select * from conta_corrente;
+
+create or replace trigger ins_mov_cc
+  before insert on mov_cc
+  for each row
+begin
+  if upper(:new.tipo) = 'C' then
+    update conta_corrente set saldo = saldo + :new.valor
+    where  nr = :new.nr_cc;
+  elsif upper(:new.tipo) = 'D' then
+  update conta_corrente set saldo = saldo - :new.valor
+    where  nr = :new.nr_cc;
+  else 
+    raise_application_error (-20001, 'tipo nao valido');
+  end if;
+end;
+
+insert into mov_cc values (1, 101, 'C', 1000);
+insert into mov_cc values (2, 111, 'D', 1000);
+insert into mov_cc values (3, 111, 'C', 10000);
+
+Select * from conta_corrente;
+
+create or replace trigger del_movimento
+  before delete on mov_cc
+  for each row
+begin
+  if upper(:old.tipo) = 'C' then
+    update conta_corrente set saldo = saldo - :old.valor where nr = :old.nr_cc;
+  elsif upper(:old.tipo) = 'D' then
+     update conta_corrente set saldo = saldo + :old.valor where  nr = :old.nr_cc;
+  end if;
+  
+end;
+
+
+
+
+create or replace trigger up_movimento
+  before update on mov_cc
+  for each row
+begin
+  if upper(:old.tipo) = 'C' then
+    update conta_corrente set saldo = saldo - :old.valor where nr = :old.nr_cc;
+  elsif upper(:old.tipo) = 'D' then
+    update conta_corrente set saldo = saldo + :old.valor where nr = :old.nr_cc;
+  end if;
+  if upper(:new.tipo) = 'C' then
+    update conta_corrente set saldo = saldo + :new.valor where nr = :new.nr_cc;
+  elsif upper(:new.tipo) = 'D' then
+    update conta_corrente set saldo = saldo - :new.valor where  nr = :new.nr_cc;
+  else raise_application_error (-20001, 'tipo nao valido');
+  end if;
+end;
